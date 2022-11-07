@@ -19,6 +19,7 @@ class _HomeState extends State<Home> {
   double time = 0.0;
   double velocity = 2.9;
   double gravity = -4.9;
+  int score = 0;
   bool isGameRun = false;
 
   List<AsteroidDetail> asteroidDetail = [];
@@ -27,7 +28,7 @@ class _HomeState extends State<Home> {
     List<AsteroidDetail> data = [
       AsteroidDetail(
           size: const Size(40, 60),
-          alignment: const Alignment(2, 0.7),
+          alignment: const Alignment(3.2, 0.7),
       ),
       AsteroidDetail(
         size: const Size(80, 100),
@@ -39,7 +40,7 @@ class _HomeState extends State<Home> {
       ),
       AsteroidDetail(
         size: const Size(60, 30),
-        alignment: const Alignment(2.2, 0.2),
+        alignment: const Alignment(2.6, 0.2),
       ),
     ];
     return data;
@@ -109,6 +110,20 @@ class _HomeState extends State<Home> {
       } else {
         asteroidDetail[3].alignment = Alignment(2.2, generateRndmNmbr());
       }
+
+      if(ast1.x <= 0.021 && ast1.x >= 0.001) {
+        score++;
+      }
+      if(ast2.x <= 0.021 && ast2.x >= 0.001) {
+        score++;
+      }
+      if(ast3.x <= 0.021 && ast3.x >= 0.001) {
+        score++;
+      }
+      if(ast4.x <= 0.021 && ast4.x >= 0.001) {
+        score++;
+      }
+
   }
 
   bool isShipColide() {
@@ -144,7 +159,7 @@ class _HomeState extends State<Home> {
         final shipSize = shipRenderBox.size;
         bool _isCollide = (shipPos.dx < astPos.dx + astSize.width &&
             shipPos.dx + shipSize.width > astPos.dx &&
-            astPos.dy < astPos.dy + astSize.height &&
+            shipPos.dy < astPos.dy + astSize.height &&
             shipPos.dy + shipSize.height > astPos.dy);
         if(_isCollide) {
           isCollide = true;
@@ -182,6 +197,7 @@ class _HomeState extends State<Home> {
        time = 0.0;
        velocity = 2.9;
        gravity = -4.9;
+       score = 0;
        isGameRun = false;
      });
   }
@@ -285,6 +301,19 @@ class _HomeState extends State<Home> {
                   child: Text(
                     'Tap to Play',
                     style: TextStyle(
+                      fontStyle: FontStyle.italic,
+                      color: Colors.white,
+                      letterSpacing: 4,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 30,
+                    ),
+                  ),
+                ),
+                Align(
+                  alignment: const Alignment(0, 0.8),
+                  child: Text(
+                    'Score : $score',
+                    style: const TextStyle(
                       fontStyle: FontStyle.italic,
                       color: Colors.white,
                       letterSpacing: 4,
