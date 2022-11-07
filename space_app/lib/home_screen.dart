@@ -127,10 +127,10 @@ class _HomeState extends State<Home> {
   }
 
   bool isShipColide() {
-      if(shipY > 1) {
+      if(shipY > 0.98) {
         return true;
       }
-      else if(shipY < -0.95) {
+      else if(shipY < - 0.98) {
         return true;
       }
       else if(checkShipAstColide()) {
@@ -225,8 +225,8 @@ class _HomeState extends State<Home> {
                   alignment: Alignment(shipX,shipY),
                   child: Container(
                     key: shipKey,
-                    height: 50,
-                    width: 50,
+                    height: 80,
+                    width: 80,
                     decoration: const BoxDecoration(
                       image: DecorationImage(
                         image: AssetImage(
