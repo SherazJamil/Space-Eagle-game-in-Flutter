@@ -55,6 +55,9 @@ class _HomeState extends State<Home> {
         setState(() {
           maxHeight = velocity * time + gravity * time * time;
           shipY = initialPos - maxHeight;
+          if(isShipColide()) {
+            timer.cancel();
+          }
         });
         moveAst();
       }
@@ -102,6 +105,18 @@ class _HomeState extends State<Home> {
       }
   }
 
+  bool isShipColide() {
+      if(shipY > 1) {
+        return true;
+      }
+      else if(shipY < -0.95) {
+        return true;
+      }
+      else {
+        return false;
+      }
+  }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -142,7 +157,6 @@ class _HomeState extends State<Home> {
                     ),
                   ),
                 ),
-
                 Align(
                   alignment: asteroidDetail[0].alignment,
                   child: Container(
@@ -199,7 +213,16 @@ class _HomeState extends State<Home> {
                     ),
                   ),
                 ),
-
+                Align(
+                  alignment: Alignment(0, -0.3),
+                  child: Text(
+                    'Tap to Play',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 30,
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
