@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:space_app/collision_model.dart';
 import 'asteroid_model.dart';
 
 class Home extends StatefulWidget {
@@ -44,7 +45,11 @@ class _HomeState extends State<Home> {
     return data;
     }
 
+    List<GlobalKey> globalKeys = [];
+    GlobalKey shipKey = GlobalKey();
+
   void startGame() {
+    resetData();
     isGameRun = true;
     Timer.periodic(
       const Duration(
@@ -57,6 +62,7 @@ class _HomeState extends State<Home> {
           shipY = initialPos - maxHeight;
           if(isShipColide()) {
             timer.cancel();
+            isGameRun = false;
           }
         });
         moveAst();
@@ -112,9 +118,44 @@ class _HomeState extends State<Home> {
       else if(shipY < -0.95) {
         return true;
       }
+      else if(checkShipAstColide()) {
+        return true;
+      }
       else {
         return false;
       }
+  }
+
+  bool checkShipAstColide() {
+    bool isCollide = false;
+    RenderBox shipRenderBox = shipKey.currentContext!.findRenderObject() as RenderBox;
+
+    List<Collision> collisionDetail = [];
+    for(var element in globalKeys) {
+      RenderBox renderBox = element.currentContext!.findRenderObject() as RenderBox;
+      collisionDetail.add(
+          Collision(
+          positBox: renderBox.localToGlobal(Offset.zero),
+          sizeofObj: renderBox.size));
+      for(var element in collisionDetail) {
+        final shipPos = shipRenderBox.localToGlobal(Offset.zero);
+        final astPos = element.positBox;
+        final astSize = element.sizeofObj;
+        final shipSize = shipRenderBox.size;
+        bool _isCollide = (shipPos.dx < astPos.dx + astSize.width &&
+            shipPos.dx + shipSize.width > astPos.dx &&
+            astPos.dy < astPos.dy + astSize.height &&
+            shipPos.dy + shipSize.height > astPos.dy);
+        if(_isCollide) {
+          isCollide = true;
+          break;
+        } else {
+          isCollide = false;
+        }
+      }
+    }
+
+    return isCollide;
   }
 
   @override
@@ -122,6 +163,27 @@ class _HomeState extends State<Home> {
     // TODO: implement initState
     super.initState();
     asteroidDetail = setAsteroidDetail();
+    initGK();
+  }
+
+  void initGK() {
+    for(int i = 0 ; i < 4 ; i++) {
+      globalKeys.add(GlobalKey());
+    }
+  }
+
+  void resetData() {
+     setState(() {
+       asteroidDetail = setAsteroidDetail();
+       shipX = 0.0;
+       shipY = 0.0;
+       maxHeight = 0.0;
+       initialPos = 0.0;
+       time = 0.0;
+       velocity = 2.9;
+       gravity = -4.9;
+       isGameRun = false;
+     });
   }
 
   @override
@@ -146,6 +208,7 @@ class _HomeState extends State<Home> {
                 Align(
                   alignment: Alignment(shipX,shipY),
                   child: Container(
+                    key: shipKey,
                     height: 50,
                     width: 50,
                     decoration: const BoxDecoration(
@@ -160,6 +223,7 @@ class _HomeState extends State<Home> {
                 Align(
                   alignment: asteroidDetail[0].alignment,
                   child: Container(
+                    key: globalKeys[0],
                     height: asteroidDetail[0].size.height,
                     width: asteroidDetail[0].size.width,
                     decoration: BoxDecoration(
@@ -174,6 +238,7 @@ class _HomeState extends State<Home> {
                 Align(
                   alignment: asteroidDetail[1].alignment,
                   child: Container(
+                    key: globalKeys[1],
                     height: asteroidDetail[1].size.height,
                     width: asteroidDetail[1].size.width,
                     decoration: BoxDecoration(
@@ -188,6 +253,7 @@ class _HomeState extends State<Home> {
                 Align(
                   alignment: asteroidDetail[2].alignment,
                   child: Container(
+                    key: globalKeys[2],
                     height: asteroidDetail[2].size.height,
                     width: asteroidDetail[2].size.width,
                     decoration: BoxDecoration(
@@ -202,6 +268,7 @@ class _HomeState extends State<Home> {
                 Align(
                   alignment: asteroidDetail[3].alignment,
                   child: Container(
+                    key: globalKeys[3],
                     height: asteroidDetail[3].size.height,
                     width: asteroidDetail[3].size.width,
                     decoration: BoxDecoration(
@@ -213,11 +280,14 @@ class _HomeState extends State<Home> {
                     ),
                   ),
                 ),
-                Align(
+                isGameRun ? const SizedBox() : const Align(
                   alignment: Alignment(0, -0.3),
                   child: Text(
                     'Tap to Play',
                     style: TextStyle(
+                      fontStyle: FontStyle.italic,
+                      color: Colors.white,
+                      letterSpacing: 4,
                       fontWeight: FontWeight.w600,
                       fontSize: 30,
                     ),
